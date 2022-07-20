@@ -1,0 +1,23 @@
+---
+- name: Copy the server to the remote server.
+  hosts: new_nginx
+  vars:
+    date: "{{ lookup('pipe', 'date +%Y-%m-%d') }}"
+  tasks:
+
+    - name: create folder if it doesn't exist.
+      command: "mkdir -p /home/negadmin/Angualar4Client_Backup/Angualar4Client.{{ date }}"
+
+    - name: Take backup of the existing folder in remote {{ new_nginx }} server.
+      copy:
+        src: "/usr/local/web/Angualar4Client"
+        dest: "/home/negadmin/Angualar4Client_Backup/Angualar4Client.{{ date }}/"
+        remote_src: true
+
+    - name: Delete the old folder
+      file:
+       path: "/usr/local/web/Angualar4Client"
+       state: absent
+
+    - name: Copy the files to Anagular4 folder
+    

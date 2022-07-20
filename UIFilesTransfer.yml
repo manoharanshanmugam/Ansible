@@ -1,0 +1,9 @@
+---
+
+- name: Ansible Secure Copy from Remote to local
+  hosts: localhost
+  tasks:
+    - name:  Copy the Angular_4 files from 201 server to local server.
+      shell: "scp -r root@119.226.225.201:/home/prakash/Angular_Build /home/ansible/"
+      register: lsout
+      tags: lsout

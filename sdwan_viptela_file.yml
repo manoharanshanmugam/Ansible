@@ -1,0 +1,49 @@
+---
+
+- name: SDWAN
+  hosts: localhost
+  become_user: root
+
+  tasks:
+    - name: Download the SDWAN file from the Jenkins to local server
+      get_url:
+        url: "http://1.6.36.109:8080/job/SDWAN%20Viptela/ws/target/SDWANViptelaService_55122.jar"
+        dest: /home/ansible/sdwan_viptela/
+        mode: 0755
+
+
+- name: SDWAN_Viptela
+  hosts: sdwan_viptela
+  become_user: negadmin
+
+  tasks:
+   - name: Transferring the files to the remote server
+     copy:
+       src: /home/ansible/sdwan_viptela/SDWANViptelaService_55122.jar
+       dest: /data/home/Viptela_Polling/
+       mode: 0644
+       owner: negadmin
+       group: negadmin
+
+   - name: Remove the existing Symbolic link
+     file:
+       path: /data/home/Viptela_Polling/SDWANViptelaService
+       state: absent
+
+   - name: Create Symbolic link in the remote server for the file and folder
+     file:
+       src: /data/home/Viptela_Polling/SDWANViptelaService_55122.jar
+       dest: /data/home/Viptela_Polling/SDWANViptelaService.jar
+       state: link
+
+   - name: Execute stop script for the application.
+     shell: stopViptela.sh
+     args:
+       chdir: /data/home/Viptela_Polling/
+       executable: /bin/bash
+
+   - name: Execute start script for the application.
+     shell: startViptela.sh
+     args:
+       chdir: /data/home/Viptela_Polling/
+       executable: /bin/bash
